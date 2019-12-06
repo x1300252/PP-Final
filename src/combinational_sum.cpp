@@ -3,8 +3,9 @@ using namespace std;
 
 vector<vector<vector<pair<int, int>>>> combinations;
 
-void turn_into_collide_form(vector<vector<pair<int, int>>> *all_results,
-                            vector<int> *result) {  
+void turn_into_collide_form(int idx,
+                            vector<int> *result) {
+  // cout << idx << endl;
   vector<int> unique_result = *result;
   vector<pair<int, int>> final_result;
   int cnt;
@@ -15,111 +16,54 @@ void turn_into_collide_form(vector<vector<pair<int, int>>> *all_results,
     final_result.push_back(make_pair(unique_result[i], cnt));
   }
 
-  all_results->push_back(final_result);
+  combinations[idx].push_back(final_result);
 
   return;
 }
 
-void get_combinations(int target, int start, int max_size,
-                      vector<vector<pair<int, int>>> *all_results,
+void get_combinations(int target, int start, int max_target,
                       vector<int> *result) {
-  // if (result->size() == (max_size - 1) && target == start) {
-  //   result->push_back(target);
-
-  //   turn_into_collide_form(all_results, result);
-  //   result->pop_back();
-  //   return;
-  // } else if (result->size() >= max_size) {
-  //   return;
-  // }
-
-  // for (int i = start; i <= target;) {
-  //   result->push_back(i);
-  //   if (i == target) {
-  //     turn_into_collide_form(all_results, result);
-  //   } else {
-  //     get_combinations(target - i, i, max_size, all_results, result);
-  //   }
-  //   i = result->back() + 1;
-  //   result->pop_back();
-  // }
-
-  if (target < 0)
-    return;
-
-  if (result->size() == max_size && target)
-    return;
-  
-  if (target == 0) {
-    turn_into_collide_form(all_results, result);
-    return;
+  int result_size, idx;
+  // cout << target << " " << start << " " << max_target << " " << result->size() << endl;
+  if (result->size()) {
+    turn_into_collide_form(max_target-target, result);
   }
 
-  int i = start;
-  while (target - i >= 0) {
+  for (int i = start; i < max_target+1; i++) {
+    if (target < i) {
+      break;
+    }
+
+    result_size = result->size();
+    idx = max_target - target + i;
+
+    if(idx < 51 && result_size > 6)
+      break;
+    else if (idx > 50 && idx < 301 && result_size > 4)
+      break;
+    else if (idx > 300 && idx > 300 && result_size > 1)
+      break;
     result->push_back(i);
-    get_combinations(target - i, i, max_size, all_results, result);
-    i++;
+    get_combinations(target - i, i, max_target, result);
     result->pop_back();
-  }  
-
-  return;
-}
-
-void compute_combinations() {
-  for (int i = 1; i < 51; i++) {
-    vector<vector<pair<int, int>>> all_results;
-    vector<int> result;
-    get_combinations(i, 1, 7, &all_results, &result);
-
-    // cout << i << ": ";
-    // for (size_t j = 0; j < all_results.size(); j++) {
-    // 	cout << "( ";
-    // 	for (size_t k = 0; k < all_results[j].size(); k++) {
-    // 		cout << all_results[j][k].first << ":" << all_results[j][k].second << " ";
-    // 	}
-    // 	cout << ") ";
-    // }
-    // cout << endl;
   }
-
-  for (int i = 51; i < 301; i++) {
-    vector<vector<pair<int, int>>> all_results;
-    vector<int> result;
-    get_combinations(i, 1, 5, &all_results, &result);
-
-    // cout << i << ": ";
-    // for (size_t j = 0; j < all_results.size(); j++) {
-    // 	cout << "( ";
-    // 	for (size_t k = 0; k < all_results[j].size(); k++) {
-    // 		cout << all_results[j][k].first << ":" << all_results[j][k].second << " ";
-    // 	}
-    // 	cout << ") ";
-    // }
-    // cout << endl;
-  }
-
-  // for (int i = 301; i < 1001; i++) {
-  //   vector<vector<pair<int, int>>> all_results;
-  //   vector<int> result;
-  //   get_combinations(i, 1, 4, &all_results, &result);
-
-  //   // cout << i << ": ";
-  //   // for (size_t j = 0; j < all_results.size(); j++) {
-  //   // 	cout << "( ";
-  //   // 	for (size_t k = 0; k < all_results[j].size(); k++) {
-  //   // 		cout << all_results[j][k].first << ":" << all_results[j][k].second << " ";
-  //   // 	}
-  //   // 	cout << ") ";
-  //   // }
-  //   // cout << endl;
-  // }
 
   return;
 }
 
 int main() {
-  compute_combinations();
+  // compute_combinations();
+  vector<vector<pair<int, int>>> tmp;
+  for (int i=0; i<301; i++) {
+    combinations.push_back(tmp);
+  }
+
+  vector<int> result;
+  get_combinations(50, 1, 50, &result);
+
+  // for (int i = 1; i < 51; i++) {
+  //   cout << i << ": " << combinations[i].size() << endl;
+  // }
 
   return 0;
 }
