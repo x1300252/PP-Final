@@ -68,17 +68,19 @@ void get_probability(double *hash_tables, int max_idx, int hash_table_size) {
     for (size_t i = 1; i < combinations.size(); i++) {
         vector<double> probabilities_of_i;
         sum_of_probabilities = 0;
-        for (size_t j = 0; j < combinations[i].size(); j++) {
-            temp = 1;
-            for (size_t k = 0; k < combinations[i][j].size(); k++) {
-                if (factors[combinations[i][j][k].first] == 0) {
-                    temp = 0;
-                    break;
+        if (factors[i] != 0) {
+            for (size_t j = 0; j < combinations[i].size(); j++) {
+                temp = 1;
+                for (size_t k = 0; k < combinations[i][j].size(); k++) {
+                    if (factors[combinations[i][j][k].first] == 0) {
+                        temp = 0;
+                        break;
+                    }
+                    temp *= pow(factors[combinations[i][j][k].first], combinations[i][j][k].second) / fractorials[combinations[i][j][k].second];
                 }
-                temp *= pow(factors[combinations[i][j][k].first], combinations[i][j][k].second) / fractorials[combinations[i][j][k].second];
+                probabilities_of_i.push_back(temp);
+                sum_of_probabilities += temp;
             }
-            probabilities_of_i.push_back(temp);
-            sum_of_probabilities += temp;
         }
         cout << i << " " << sum_of_probabilities << endl;
         probabilities_of_i.push_back(sum_of_probabilities);
@@ -128,6 +130,6 @@ int main(int argc, char** argv) {
     gettimeofday(&end, NULL);
     cout << "Compute probabilities: " << end.tv_sec-start.tv_sec << "." << end.tv_usec-start.tv_usec << "s" << endl;
 
-    
+
     return 0;
 }
