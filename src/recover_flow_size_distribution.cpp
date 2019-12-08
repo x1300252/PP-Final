@@ -90,10 +90,10 @@ void get_probability(double *hash_tables, int max_idx, int hash_table_size) {
             for (size_t j = 0; j < combinations[i].size(); j++) {
                 temp = 1;
                 for (size_t k = 0; k < combinations[i][j].size(); k++) {
-                    if (factors[combinations[i][j][k].first] == 0) {
-                        temp = 0;
-                        break;
-                    }
+                    // if (factors[combinations[i][j][k].first] == 0) {
+                    //     temp = 0;
+                    //     break;
+                    // }
                     temp *= pow(factors[combinations[i][j][k].first], combinations[i][j][k].second) / fractorials[combinations[i][j][k].second];
                 }
                 probabilities_of_i.push_back(temp);
@@ -157,7 +157,7 @@ int main(int argc, char** argv) {
         get_probability(current, max_idx, hash_table_size); 
         gettimeofday(&end, NULL);
         timersub(&end, &start, &diff);
-        // cout << "Compute probabilities: " << diff.tv_sec << "." << diff.tv_usec << "s" << endl;
+        cout << "Compute probabilities: " << diff.tv_sec << "." << diff.tv_usec << "s" << endl;
 
         gettimeofday(&start, NULL);
         for (size_t i = 1; i < combinations.size(); i++) {
@@ -174,9 +174,9 @@ int main(int argc, char** argv) {
         wmrd = WMRD(current, next, max_idx);
         gettimeofday(&end, NULL);
         timersub(&end, &start, &diff);
-        cout << "Iteration " << iteration_cnt << ": " << wmrd << "\t\t" << diff.tv_sec << "." << diff.tv_usec << "s" << endl;
+        cout << "Iteration " << iteration_cnt << ": " << wmrd << "\t" << diff.tv_sec << "." << diff.tv_usec << "s" << endl;
 
-        if (wmrd < 0.15)
+        if (wmrd < 0.05)
             break;
 
         free(current);
