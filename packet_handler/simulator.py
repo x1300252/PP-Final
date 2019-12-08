@@ -13,7 +13,7 @@ def generate_flow_label (row, table_size):
     #         row['Source.Port'] << 16 + row['Destination.Port'] << 8 + row['Protocol']
 
 
-# df = pd.read_csv('./raw_data/app_flow.csv', usecols=[1, 2, 3, 4, 5])
+# df = pd.read_csv('./raw_data/app_flow.csv', usecols=[0])
 
 # df.to_csv('./flow_data/app_flow.csv', index=False)
 

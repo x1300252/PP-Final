@@ -176,7 +176,7 @@ int main(int argc, char** argv) {
         timersub(&end, &start, &diff);
         cout << "Iteration " << iteration_cnt << ": " << wmrd << "\t\t" << diff.tv_sec << "." << diff.tv_usec << "s" << endl;
 
-        if (wmrd < 0.05)
+        if (wmrd < 0.15)
             break;
 
         free(current);
