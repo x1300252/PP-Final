@@ -61,9 +61,17 @@ int main() {
   vector<int> result;
   get_combinations(999, 1, 999, &result);
 
-  // for (int i = 1; i < 51; i++) {
-  //   cout << i << ": " << combinations[i].size() << endl;
-  // }
-
+  ofstream combinational_sum_file;
+  combinational_sum_file.open ("combinational_sum.txt");
+  for (int i = 1; i < 1000; i++) {
+    combinational_sum_file << i << " " << combinations[i].size() << endl;
+    for (int j = 0; j < combinations[i].size(); j++) {
+      for (int k = 0; k < combinations[i][j].size(); k++) {
+        combinational_sum_file << combinations[i][j][k].first << " " << combinations[i][j][k].second << " ";
+      }
+      combinational_sum_file << endl;
+    }
+  }
+  combinational_sum_file.close();
   return 0;
 }
