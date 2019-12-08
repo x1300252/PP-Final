@@ -39,7 +39,7 @@ void get_combinations(int target, int start, int max_target,
     result_size = result->size();
     idx = max_target - target + i;
 
-    if(idx < 51 && result_size > 5)
+    if(idx < 51 && result_size > 6)
       break;
     else if (idx > 50 && idx < 301 && result_size > 3)
       break;
@@ -53,6 +53,23 @@ void get_combinations(int target, int start, int max_target,
   return;
 }
 
+void compute_combinations(int max_idx) {
+    struct timeval diff, start, end;
+    gettimeofday(&start, NULL);
+
+    vector<vector<pair<int, int>>> tmp;
+    for (int i=0; i<max_idx+1; i++) {
+        combinations.push_back(tmp);
+    }
+
+    vector<int> result;
+    get_combinations(max_idx, 1, max_idx, &result);
+
+    gettimeofday(&end, NULL);
+    timersub(&end, &start, &diff);
+    cout << "Compute combinational sums: " << diff.tv_sec << "." << diff.tv_usec << "s" << endl;
+}
+
 void get_probability(double *hash_tables, int max_idx, int hash_table_size) {
     int fractorials[8] = {1, 1, 2, 6, 24, 120 , 720, 5040};
 
@@ -61,10 +78,11 @@ void get_probability(double *hash_tables, int max_idx, int hash_table_size) {
         if (hash_tables[i] != 0) {
             factors[i] = hash_tables[i] / hash_table_size;
         }
-        // cout << i << " " << factors[i] << endl;
     }
 
     double temp, sum_of_probabilities;
+    vector<double> probabilities_of_i;
+    probabilities.push_back(probabilities_of_i);
     for (size_t i = 1; i < combinations.size(); i++) {
         vector<double> probabilities_of_i;
         sum_of_probabilities = 0;
@@ -81,11 +99,27 @@ void get_probability(double *hash_tables, int max_idx, int hash_table_size) {
                 probabilities_of_i.push_back(temp);
                 sum_of_probabilities += temp;
             }
+
+            for (size_t a = 0; a < probabilities_of_i.size(); a++) {
+                probabilities_of_i[a] /= sum_of_probabilities;
+            }
         }
-        cout << i << " " << sum_of_probabilities << endl;
-        probabilities_of_i.push_back(sum_of_probabilities);
+        else { 
+            probabilities_of_i.push_back(sum_of_probabilities);
+        }
         probabilities.push_back(probabilities_of_i);
     }
+}
+
+double WMRD(double *current, double *next, int max_idx) {
+    double sum_of_abs = 0;
+    double sum_of_avg = 0;
+    for (int i = 0; i < max_idx + 1; i++) {
+        sum_of_abs += abs(next[i] - current[i]);
+        sum_of_avg += (next[i] + current[i]) / 2;
+    }
+
+    return sum_of_abs / sum_of_avg;
 }
 
 int main(int argc, char** argv) {
@@ -107,29 +141,59 @@ int main(int argc, char** argv) {
             max_idx = idx;
         }
     }
+    infile.close();
 
-    double *temp = (double *)realloc(hash_table, sizeof(double) * (max_idx + 1));
+    double *current = (double *)realloc(hash_table, sizeof(double) * (max_idx + 1));
 
-    struct  timeval start;
-    struct  timeval end;
+    compute_combinations(max_idx);
 
-    gettimeofday(&start, NULL);
-    vector<vector<pair<int, int>>> tmp;
-    for (int i=0; i<max_idx+1; i++) {
-        combinations.push_back(tmp);
+    struct timeval diff, start, end;
+    double *next = (double *)calloc(max_idx + 1, sizeof(double));
+    double wmrd;
+    int iteration_cnt = 0;
+    while (1) {
+        iteration_cnt++;
+        gettimeofday(&start, NULL);
+        get_probability(current, max_idx, hash_table_size); 
+        gettimeofday(&end, NULL);
+        timersub(&end, &start, &diff);
+        // cout << "Compute probabilities: " << diff.tv_sec << "." << diff.tv_usec << "s" << endl;
+
+        gettimeofday(&start, NULL);
+        for (size_t i = 1; i < combinations.size(); i++) {
+            if (current[i] != 0) {
+                for (size_t j = 0; j < combinations[i].size(); j++) {
+                    if (probabilities[i][j] != 0) {
+                        for (size_t k = 0; k < combinations[i][j].size(); k++) {
+                            next[combinations[i][j][k].first] += current[i] * combinations[i][j][k].second * probabilities[i][j];
+                        }
+                    }
+                }
+            }
+        }
+        wmrd = WMRD(current, next, max_idx);
+        gettimeofday(&end, NULL);
+        timersub(&end, &start, &diff);
+        cout << "Iteration " << iteration_cnt << ": " << wmrd << "\t\t" << diff.tv_sec << "." << diff.tv_usec << "s" << endl;
+
+        if (wmrd < 0.05)
+            break;
+
+        free(current);
+        current = next;
+        next = (double *)calloc(max_idx + 1, sizeof(double));        
     }
 
-    vector<int> result;
-    get_combinations(max_idx, 1, max_idx, &result);
-    gettimeofday(&end, NULL);
+    string out_fname("../recover_result/");
+    out_fname += argv[1];
+    out_fname += ".csv";
+    ofstream outfile(out_fname.c_str());
+    outfile << "Flow.size,recover_result" << endl;
+    for (int i = 1; i < max_idx + 1; i++) {
+        outfile << i << "," << current[i] << endl;
+    }
+    outfile.close();
 
-    cout << "Compute combinational sums: " << end.tv_sec-start.tv_sec << "." << end.tv_usec-start.tv_usec << "s" << endl;
-
-    gettimeofday(&start, NULL);
-    get_probability(temp, max_idx, hash_table_size);
-    gettimeofday(&end, NULL);
-    cout << "Compute probabilities: " << end.tv_sec-start.tv_sec << "." << end.tv_usec-start.tv_usec << "s" << endl;
-
-
+    free(current);
     return 0;
 }
