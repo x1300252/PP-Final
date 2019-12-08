@@ -37,11 +37,11 @@ void get_combinations(int target, int start, int max_target,
     result_size = result->size();
     idx = max_target - target + i;
 
-    if(idx < 51 && result_size > 6)
+    if(idx < 51 && result_size > 5)
       break;
-    else if (idx > 50 && idx < 301 && result_size > 4)
+    else if (idx > 50 && idx < 301 && result_size > 3)
       break;
-    else if (idx > 300 && idx > 300 && result_size > 1)
+    else if (idx > 300 && idx > 300 && result_size > 2)
       break;
     result->push_back(i);
     get_combinations(target - i, i, max_target, result);
@@ -54,12 +54,12 @@ void get_combinations(int target, int start, int max_target,
 int main() {
   // compute_combinations();
   vector<vector<pair<int, int>>> tmp;
-  for (int i=0; i<301; i++) {
+  for (int i=0; i<1001; i++) {
     combinations.push_back(tmp);
   }
 
   vector<int> result;
-  get_combinations(50, 1, 50, &result);
+  get_combinations(999, 1, 999, &result);
 
   // for (int i = 1; i < 51; i++) {
   //   cout << i << ": " << combinations[i].size() << endl;
