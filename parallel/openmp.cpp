@@ -60,15 +60,15 @@ void compute_combinations(int max_idx) {
     struct timeval diff, start, end;
     gettimeofday(&start, NULL);
 
-    max_idx++;
+    // max_idx++;
 
     vector<vector<pair<int, int>>> tmp;
-    for (int i=0; i<max_idx; i++) {
+    for (int i=0; i<max_idx+1; i++) {
         combinations.push_back(tmp);
     }
 
-    #pragma omp parallel for
-    for (int i = 1; i < max_idx; i++) {
+    // #pragma omp parallel for
+    for (int i = 1; i < max_idx+1; i++) {
         vector<int> result(1, i);
         // result.push_back(i);
         get_combinations(max_idx - i, i, max_idx, &result);
