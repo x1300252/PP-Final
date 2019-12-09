@@ -41,21 +41,21 @@ hash_size_distribution_500000 = pd.DataFrame({'hash_size_cnt_500000' : hash_size
 hash_size_distribution_750000 = pd.DataFrame({'hash_size_cnt_750000' : hash_size_750000.groupby( ['Flow.size'] ).size()}).reset_index()
 hash_size_distribution_1000000 = pd.DataFrame({'hash_size_cnt_1000000' : hash_size_1000000.groupby( ['Flow.size'] ).size()}).reset_index()
 
-hash_size_distribution_100000.loc[-1] = [0, 100000-hash_size_100000.shape()[0]]  # adding a row
+hash_size_distribution_100000.loc[-1] = [0, 100000-hash_size_100000.shape[0]]  # adding a row
 hash_size_distribution_100000.index = hash_size_distribution_100000.index + 1  # shifting index
-hash_size_distribution_100000 = hash_size_distribution_100000.sort_index()
+hash_size_distribution_100000 = hash_size_distribution_100000.sort_values(by=['Flow.size'])
 
-hash_size_distribution_500000.loc[-1] = [0, 500000-hash_size_500000.shape()[0]]  # adding a row
+hash_size_distribution_500000.loc[-1] = [0, 500000-hash_size_500000.shape[0]]  # adding a row
 hash_size_distribution_500000.index = hash_size_distribution_500000.index + 1  # shifting index
-hash_size_distribution_500000 = hash_size_distribution_500000.sort_index()
+hash_size_distribution_500000 = hash_size_distribution_500000.sort_values(by=['Flow.size'])
 
-hash_size_distribution_750000.loc[-1] = [0, 750000-hash_size_750000.shape()[0]]  # adding a row
+hash_size_distribution_750000.loc[-1] = [0, 750000-hash_size_750000.shape[0]]  # adding a row
 hash_size_distribution_750000.index = hash_size_distribution_750000.index + 1  # shifting index
-hash_size_distribution_750000 = hash_size_distribution_750000.sort_index()
+hash_size_distribution_750000 = hash_size_distribution_750000.sort_values(by=['Flow.size'])
 
-hash_size_distribution_1000000.loc[-1] = [0, 1000000-hash_size_1000000.shape()[0]]  # adding a row
+hash_size_distribution_1000000.loc[-1] = [0, 1000000-hash_size_1000000.shape[0]]  # adding a row
 hash_size_distribution_1000000.index = hash_size_distribution_1000000.index + 1  # shifting index
-hash_size_distribution_1000000 = hash_size_distribution_1000000.sort_index()
+hash_size_distribution_1000000 = hash_size_distribution_1000000.sort_values(by=['Flow.size'])
 
 # print(hash_size_distribution_100000)
 # print(hash_size_distribution['hash_size_cnt'].sum())
@@ -76,6 +76,8 @@ result['hash_size_cnt_100000'] = pd.to_numeric(result['hash_size_cnt_100000']).a
 result['hash_size_cnt_500000'] = pd.to_numeric(result['hash_size_cnt_500000']).astype(int)
 result['hash_size_cnt_750000'] = pd.to_numeric(result['hash_size_cnt_750000']).astype(int)
 result['hash_size_cnt_1000000'] = pd.to_numeric(result['hash_size_cnt_1000000']).astype(int)
+
+result = result.sort_values(by=['Flow.size'])
 
 result.index.name = 'idx'
 result.to_csv('./flow_data/app_flow_size_distribution.csv')

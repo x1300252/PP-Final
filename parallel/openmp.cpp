@@ -11,7 +11,6 @@ vector<vector<double>> probabilities;
 
 void turn_into_collide_form(int idx,
                             vector<int> *result) {
-  // cout << idx << endl;
   vector<int> unique_result = *result;
   vector<pair<int, int>> final_result;
   int cnt;
@@ -34,7 +33,7 @@ void get_combinations(int target, int start, int max_target,
   if (result->size()) {
     turn_into_collide_form(max_target-target, result);
   }
-
+    #pragma unroll 10
   for (int i = start; i < max_target+1; i++) {
     if (target < i) {
       break;

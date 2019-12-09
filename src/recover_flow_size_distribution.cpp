@@ -137,9 +137,11 @@ int main(int argc, char** argv) {
     string line;
     int idx;
     double val;
+    double cnt_with_val_0;
     int max_idx = 0;
 
     getline(infile, line);
+    infile >> idx >> cnt_with_val_0;
     while (infile >> idx >> val) {
         if (val != 0) {
             hash_table[idx] = val;
@@ -151,6 +153,11 @@ int main(int argc, char** argv) {
     double *current = (double *)realloc(hash_table, sizeof(double) * (max_idx + 1));
 
     compute_combinations(max_idx);
+
+    double total_num_of_flow = hash_table_size * log2(hash_table_size / cnt_with_val_0);
+    double guess_num_of_size_1 = hash_table[1] * pow (2.71828, total_num_of_flow / hash_table_size);
+
+    // printf("%f %f\n", total_num_of_flow, guess_num_of_size_1);
 
     struct timeval diff, start, end;
     double *next = (double *)calloc(max_idx + 1, sizeof(double));
