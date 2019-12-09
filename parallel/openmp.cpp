@@ -67,7 +67,7 @@ void compute_combinations(int max_idx) {
         combinations.push_back(tmp);
     }
 
-    // #pragma omp parallel for
+    #pragma omp parallel for
     for (int i = 1; i < max_idx+1; i++) {
         vector<int> result(1, i);
         // result.push_back(i);
