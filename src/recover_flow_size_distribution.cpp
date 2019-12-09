@@ -84,9 +84,9 @@ void get_probability(double *hash_tables, int max_idx, int hash_table_size) {
     vector<double> probabilities_of_i;
     probabilities.push_back(probabilities_of_i);
     for (size_t i = 1; i < combinations.size(); i++) {
-        vector<double> probabilities_of_i;
+        probabilities_of_i.clear();
         sum_of_probabilities = 0;
-        // if (factors[i] != 0) {
+        if (factors[i] != 0) {
             for (size_t j = 0; j < combinations[i].size(); j++) {
                 temp = 1;
                 for (size_t k = 0; k < combinations[i][j].size(); k++) {
@@ -103,10 +103,11 @@ void get_probability(double *hash_tables, int max_idx, int hash_table_size) {
             for (size_t a = 0; a < probabilities_of_i.size(); a++) {
                 probabilities_of_i[a] /= sum_of_probabilities;
             }
-        // }
-        // else { 
-            probabilities_of_i.push_back(sum_of_probabilities);
-        // }
+        }
+        else { 
+            // if (probabilities_of_i.size() == 0)
+                probabilities_of_i.push_back(sum_of_probabilities);
+        }
         probabilities.push_back(probabilities_of_i);
     }
 }
@@ -176,12 +177,13 @@ int main(int argc, char** argv) {
         timersub(&end, &start, &diff);
         cout << "Iteration " << iteration_cnt << ": " << wmrd << "\t" << diff.tv_sec << "." << diff.tv_usec << "s" << endl;
 
-        if (wmrd < 0.05)
+        if (iteration_cnt == 2)
             break;
 
         free(current);
         current = next;
-        next = (double *)calloc(max_idx + 1, sizeof(double));        
+        next = (double *)calloc(max_idx + 1, sizeof(double));
+        probabilities.clear(); 
     }
 
     string out_fname("../recover_result/");
