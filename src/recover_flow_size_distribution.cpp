@@ -1,4 +1,8 @@
-#include <bits/stdc++.h>
+#include <iostream> // std::cout
+#include <fstream> // std::ifstream
+#include <algorithm> // std::unique, std::count
+#include <vector> // std::vecotr
+#include <cmath> // std::pow
 #include<sys/time.h>
 using namespace std;
 
