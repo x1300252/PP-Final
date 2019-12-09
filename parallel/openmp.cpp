@@ -33,7 +33,7 @@ void get_combinations(int target, int start, int max_target,
   if (result->size()) {
     turn_into_collide_form(max_target-target, result);
   }
-    #pragma unroll 10
+
   for (int i = start; i < max_target+1; i++) {
     if (target < i) {
       break;
@@ -60,13 +60,20 @@ void compute_combinations(int max_idx) {
     struct timeval diff, start, end;
     gettimeofday(&start, NULL);
 
+    max_idx++;
+
     vector<vector<pair<int, int>>> tmp;
-    for (int i=0; i<max_idx+1; i++) {
+    for (int i=0; i<max_idx; i++) {
         combinations.push_back(tmp);
     }
 
-    vector<int> result;
-    get_combinations(max_idx, 1, max_idx, &result);
+    #pragma omp parallel for
+    for (int i = 1; i < max_idx; i++) {
+        vector<int> result(1, i);
+        // result.push_back(i);
+        get_combinations(max_idx - i, i, max_idx, &result);
+        // result.pop_back();
+    }
 
     gettimeofday(&end, NULL);
     timersub(&end, &start, &diff);

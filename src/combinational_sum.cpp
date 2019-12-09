@@ -54,31 +54,33 @@ void get_combinations(int target, int start, int max_target,
 int main() {
   // compute_combinations();
   vector<vector<pair<int, int>>> tmp;
-  for (int i=0; i<11; i++) {
+  for (int i=0; i<31; i++) {
     combinations.push_back(tmp);
   }
 
-  vector<int> result;
-  int max = 10;
+  int max = 31;
+
+  #pragma omp parallel for
   for (int i = 1; i < max; i++) {
-    result.push_back(i);
+    vector<int> result(1, i);
+    // result.push_back(i);
     get_combinations(max - i, i, max, &result);
-    result.pop_back();
+    // result.pop_back();
   }
 
   // ofstream combinational_sum_file;
   // combinational_sum_file.open ("combinational_sum.txt");
-  for (int i = 1; i < 11; i++) {
-    cout << i << " " << combinations[i].size() << endl;
-    for (int j = 0; j < combinations[i].size(); j++) {
-      cout << "( ";
-      for (int k = 0; k < combinations[i][j].size(); k++) {
-        cout << combinations[i][j][k].first << ":" << combinations[i][j][k].second << " ";
-      }
-      cout << ") ";
-    }
-    cout << endl;
-  }
+  // for (int i = 1; i < 31; i++) {
+  //   cout << i << " " << combinations[i].size() << endl;
+  //   for (int j = 0; j < combinations[i].size(); j++) {
+  //     cout << "( ";
+  //     for (int k = 0; k < combinations[i][j].size(); k++) {
+  //       cout << combinations[i][j][k].first << ":" << combinations[i][j][k].second << " ";
+  //     }
+  //     cout << ") ";
+  //   }
+  //   cout << endl;
+  // }
   // combinational_sum_file.close();
   return 0;
 }
