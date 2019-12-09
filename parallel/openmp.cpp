@@ -11,7 +11,7 @@ vector<vector<double>> probabilities;
 
 void turn_into_collide_form(int idx,
                             vector<int> *result) {
-  vector<int> unique_result = *result;
+  vector<int> unique_result(*result);
   vector<pair<int, int>> final_result;
   int cnt;
   vector<int>::iterator it = unique(unique_result.begin(), unique_result.end());
