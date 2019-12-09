@@ -86,7 +86,7 @@ void get_probability(double *hash_tables, int max_idx, int hash_table_size) {
     for (size_t i = 1; i < combinations.size(); i++) {
         probabilities_of_i.clear();
         sum_of_probabilities = 0;
-        if (factors[i] != 0) {
+        // if (factors[i] != 0) {
             for (size_t j = 0; j < combinations[i].size(); j++) {
                 temp = 1;
                 for (size_t k = 0; k < combinations[i][j].size(); k++) {
@@ -103,11 +103,11 @@ void get_probability(double *hash_tables, int max_idx, int hash_table_size) {
             for (size_t a = 0; a < probabilities_of_i.size(); a++) {
                 probabilities_of_i[a] /= sum_of_probabilities;
             }
-        }
-        else { 
-            // if (probabilities_of_i.size() == 0)
+        // }
+        // else { 
+            if (probabilities_of_i.size() == 0)
                 probabilities_of_i.push_back(sum_of_probabilities);
-        }
+        // }
         probabilities.push_back(probabilities_of_i);
     }
 }
@@ -162,15 +162,15 @@ int main(int argc, char** argv) {
 
         gettimeofday(&start, NULL);
         for (size_t i = 1; i < combinations.size(); i++) {
-            if (current[i] != 0) {
+            // if (current[i] != 0) {
                 for (size_t j = 0; j < combinations[i].size(); j++) {
-                    if (probabilities[i][j] != 0) {
+                    // if (probabilities[i][j] != 0) {
                         for (size_t k = 0; k < combinations[i][j].size(); k++) {
                             next[combinations[i][j][k].first] += current[i] * combinations[i][j][k].second * probabilities[i][j];
                         }
-                    }
+                    // }
                 }
-            }
+            // }
         }
         wmrd = WMRD(current, next, max_idx);
         gettimeofday(&end, NULL);
