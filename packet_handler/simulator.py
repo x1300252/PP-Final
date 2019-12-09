@@ -29,18 +29,35 @@ def generate_flow_label (row, table_size):
 
 flow_size = pd.read_csv('./flow_data/app_flow_size.csv')
 print(flow_size)
-hash_size_100000 = pd.DataFrame(flow_size.groupby(['Hash.idx_100000'])['Flow.size'].sum())
-hash_size_500000 = pd.DataFrame(flow_size.groupby(['Hash.idx_500000'])['Flow.size'].sum())
-hash_size_750000 = pd.DataFrame(flow_size.groupby(['Hash.idx_750000'])['Flow.size'].sum())
-hash_size_1000000 = pd.DataFrame(flow_size.groupby(['Hash.idx_1000000'])['Flow.size'].sum())
-# print(hash_size)
+hash_size_100000 = pd.DataFrame(flow_size.groupby(['Hash.idx_100000'])['Flow.size'].sum()).dropna()
+hash_size_500000 = pd.DataFrame(flow_size.groupby(['Hash.idx_500000'])['Flow.size'].sum()).dropna()
+hash_size_750000 = pd.DataFrame(flow_size.groupby(['Hash.idx_750000'])['Flow.size'].sum()).dropna()
+hash_size_1000000 = pd.DataFrame(flow_size.groupby(['Hash.idx_1000000'])['Flow.size'].sum()).dropna()
+# print(hash_size_500000)
 # print(hash_size['Flow.size'].sum())
 # print((hash_size.groupby(['Flow.size']).size()).sum())
 hash_size_distribution_100000 = pd.DataFrame({'hash_size_cnt_100000' : hash_size_100000.groupby( ['Flow.size'] ).size()}).reset_index()
 hash_size_distribution_500000 = pd.DataFrame({'hash_size_cnt_500000' : hash_size_500000.groupby( ['Flow.size'] ).size()}).reset_index()
 hash_size_distribution_750000 = pd.DataFrame({'hash_size_cnt_750000' : hash_size_750000.groupby( ['Flow.size'] ).size()}).reset_index()
 hash_size_distribution_1000000 = pd.DataFrame({'hash_size_cnt_1000000' : hash_size_1000000.groupby( ['Flow.size'] ).size()}).reset_index()
-# print(hash_size_distribution)
+
+hash_size_distribution_100000.loc[-1] = [0, 100000-hash_size_100000.shape()[0]]  # adding a row
+hash_size_distribution_100000.index = hash_size_distribution_100000.index + 1  # shifting index
+hash_size_distribution_100000 = hash_size_distribution_100000.sort_index()
+
+hash_size_distribution_500000.loc[-1] = [0, 500000-hash_size_500000.shape()[0]]  # adding a row
+hash_size_distribution_500000.index = hash_size_distribution_500000.index + 1  # shifting index
+hash_size_distribution_500000 = hash_size_distribution_500000.sort_index()
+
+hash_size_distribution_750000.loc[-1] = [0, 750000-hash_size_750000.shape()[0]]  # adding a row
+hash_size_distribution_750000.index = hash_size_distribution_750000.index + 1  # shifting index
+hash_size_distribution_750000 = hash_size_distribution_750000.sort_index()
+
+hash_size_distribution_1000000.loc[-1] = [0, 1000000-hash_size_1000000.shape()[0]]  # adding a row
+hash_size_distribution_1000000.index = hash_size_distribution_1000000.index + 1  # shifting index
+hash_size_distribution_1000000 = hash_size_distribution_1000000.sort_index()
+
+# print(hash_size_distribution_100000)
 # print(hash_size_distribution['hash_size_cnt'].sum())
 
 

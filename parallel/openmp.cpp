@@ -167,6 +167,8 @@ int main(int argc, char** argv) {
         cout << "Compute probabilities: " << diff.tv_sec << "." << diff.tv_usec << "s" << endl;
 
         gettimeofday(&start, NULL);
+
+        #pragma omp parallel for reduction(+: next[:max_idx + 1]) 
         for (size_t i = 1; i < combinations.size(); i++) {
             // if (current[i] != 0) {
                 for (size_t j = 0; j < combinations[i].size(); j++) {
