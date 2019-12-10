@@ -65,10 +65,7 @@ void compute_combinations(int max_idx) {
     struct timeval diff, start, end;
     gettimeofday(&start, NULL);
 
-    vector<vector<pair<int, int>>> tmp;
-    for (int i=0; i<max_idx+1; i++) {
-        combinations.push_back(tmp);
-    }
+    combinations.resize(max_idx+1);
 
     // combinations.grow_to_at_least(max_idx + 1);
 
