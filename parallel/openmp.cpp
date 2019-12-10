@@ -4,9 +4,9 @@
 #include <vector> // std::vecotr
 #include <cmath> // std::pow
 #include <sys/time.h>
-#include "tbb/concurrent_vector.h"
+// #include "tbb/concurrent_vector.h"
 using namespace std;
-using namespace tbb;
+// using namespace tbb;
 
 // concurrent_vector<concurrent_vector<vector<pair<int, int>>>> combinations;
 vector<vector<vector<pair<int, int>>>> combinations;
