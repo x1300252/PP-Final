@@ -8,7 +8,9 @@
 using namespace std;
 using namespace tbb;
 
-concurrent_vector<concurrent_vector<vector<pair<int, int>>>> combinations;
+// concurrent_vector<concurrent_vector<vector<pair<int, int>>>> combinations;
+vector<vector<vector<pair<int, int>>>> combinations;
+
 vector<vector<double>> probabilities;
 
 void turn_into_collide_form(int idx,
@@ -23,7 +25,8 @@ void turn_into_collide_form(int idx,
     final_result.push_back(make_pair(unique_result[i], cnt));
   }
 
-  combinations[idx].push_back(final_result);
+  #pragma omp critical
+    combinations[idx].push_back(final_result);
 
   return;
 }
@@ -62,14 +65,12 @@ void compute_combinations(int max_idx) {
     struct timeval diff, start, end;
     gettimeofday(&start, NULL);
 
-    // max_idx++;
+    vector<vector<pair<int, int>>> tmp;
+    for (int i=0; i<max_idx+1; i++) {
+        combinations.push_back(tmp);
+    }
 
-    // concurrent_vector<vector<pair<int, int>>> tmp;
-    // for (int i=0; i<max_idx+1; i++) {
-    //     combinations.push_back(tmp);
-    // }
-
-    combinations.grow_to_at_least(max_idx + 1);
+    // combinations.grow_to_at_least(max_idx + 1);
 
     #pragma omp parallel for
     for (int i = 1; i < max_idx+1; i++) {
