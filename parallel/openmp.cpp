@@ -3,10 +3,12 @@
 #include <algorithm> // std::unique, std::count
 #include <vector> // std::vecotr
 #include <cmath> // std::pow
-#include<sys/time.h>
+#include <sys/time.h>
+#include "tbb/concurrent_vector.h"
 using namespace std;
+using namespace tbb;
 
-vector<vector<vector<pair<int, int>>>> combinations;
+concurrent_vector<concurrent_vector<vector<pair<int, int>>>> combinations;
 vector<vector<double>> probabilities;
 
 void turn_into_collide_form(int idx,
@@ -62,10 +64,12 @@ void compute_combinations(int max_idx) {
 
     // max_idx++;
 
-    vector<vector<pair<int, int>>> tmp;
-    for (int i=0; i<max_idx+1; i++) {
-        combinations.push_back(tmp);
-    }
+    // concurrent_vector<vector<pair<int, int>>> tmp;
+    // for (int i=0; i<max_idx+1; i++) {
+    //     combinations.push_back(tmp);
+    // }
+
+    combinations.grow_to_at_least(max_idx + 1);
 
     #pragma omp parallel for
     for (int i = 1; i < max_idx+1; i++) {
