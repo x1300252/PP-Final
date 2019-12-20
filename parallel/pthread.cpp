@@ -14,7 +14,7 @@ vector<vector<double>> probabilities;
 #define max_threads_num 32
 pthread_t threads[max_threads_num];
 int threads_num;
-pthread_mutex_t *lock;
+pthread_mutex_t *lock, next_lock;
 double *current, *next_temp;
 
 struct for_args {
@@ -77,10 +77,9 @@ void get_combinations(int target, int start, int max_target,
 
 void* pthread_omp_parallel_for_get_combinations(void* args) {
   int start = ((for_args*)args) -> start;
-  int end = ((for_args*)args) -> end;
   int max_idx = ((for_args*)args) -> max_idx;
-  
-  for (int i = start; i < end; i++) {
+
+  for (int i = start; i <= max_idx; i += threads_num) {
     vector<int> result(1, i);
     get_combinations(max_idx - i, i, max_idx, &result);
   }
@@ -97,8 +96,7 @@ void compute_combinations(int max_idx) {
     int threads_size = (max_idx + 1) / threads_num;
 
     for (int i = 0; i < threads_num; i++) {
-      threads_for_args[i].start = i * threads_size;
-      threads_for_args[i].end = i == threads_num - 1 ? max_idx + 1 : (i + 1) * threads_size;
+      threads_for_args[i].start = i;
       threads_for_args[i].max_idx = max_idx;
 
       pthread_create(threads + i, NULL, pthread_omp_parallel_for_get_combinations, threads_for_args + i);
@@ -174,30 +172,38 @@ void get_probability(double *hash_tables, int max_idx, int hash_table_size) {
 void* pthread_omp_parallel_for_get_next_size_distribution(void* args) {
   int start = ((for_args*)args) -> start;
   int end = ((for_args*)args) -> end;
-  
+  int max_idx = ((for_args *)args)->max_idx;
+
+  double *local_next = (double *)calloc(max_idx + 1, sizeof(double));
+
   // #pragma omp parallel for reduction(+: next_temp[:max_idx + 1]) 
   for (size_t i = start; i < end; i++) {
       // if (current[i] != 0) {
           for (size_t j = 0; j < combinations[i].size(); j++) {
               // if (probabilities[i][j] != 0) {
                   for (size_t k = 0; k < combinations[i][j].size(); k++) {
-                    pthread_mutex_lock(&lock[combinations[i][j][k].first]);
-                    next_temp[combinations[i][j][k].first] += current[i] * combinations[i][j][k].second * probabilities[i][j];
-                    pthread_mutex_unlock(&lock[combinations[i][j][k].first]);
+                    local_next[combinations[i][j][k].first] += current[i] * combinations[i][j][k].second * probabilities[i][j];
                   }
               // }
           }
       // }
   }
 
+  pthread_mutex_lock(&next_lock);
+  for (int i = 0; i <= max_idx; i++) {
+    next_temp[i] += local_next[i];
+  }
+  pthread_mutex_unlock(&next_lock);
+
   return NULL;
 }
 
-void get_next_size_distribution() {
+void get_next_size_distribution(int max_idx) {
   int threads_size = combinations.size() / threads_num;
   for (int i = 0; i < threads_num; i++) {
     threads_for_args[i].start = i == 0 ? 1 : i * threads_size;
     threads_for_args[i].end = i == threads_num -1 ? combinations.size() : (i + 1) * threads_size;
+    threads_for_args[i].max_idx = max_idx;
 
     pthread_create(threads + i, NULL, pthread_omp_parallel_for_get_next_size_distribution, threads_for_args + i);
   }
@@ -267,6 +273,8 @@ int main(int argc, char** argv) {
       pthread_mutex_init(&lock[i], NULL);
     }
 
+    pthread_mutex_init(&next_lock, NULL);
+
     while (1) {
         iteration_cnt++;
         gettimeofday(&start, NULL);
@@ -277,7 +285,7 @@ int main(int argc, char** argv) {
 
         gettimeofday(&start, NULL);
 
-        get_next_size_distribution();
+        get_next_size_distribution(max_idx);
 
         wmrd = WMRD(current, next_temp, max_idx);
         gettimeofday(&end, NULL);
