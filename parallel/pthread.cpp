@@ -95,11 +95,11 @@ void compute_combinations(int max_idx) {
 
     int threads_size = (max_idx + 1) / threads_num;
 
-    for (int i = 0; i < threads_num; i++) {
+    for (int i = 1; i <= threads_num; i++) {
       threads_for_args[i].start = i;
       threads_for_args[i].max_idx = max_idx;
 
-      pthread_create(threads + i, NULL, pthread_omp_parallel_for_get_combinations, threads_for_args + i);
+      pthread_create(threads + i - 1, NULL, pthread_omp_parallel_for_get_combinations, threads_for_args + i);
     }
     
     for (int i = 0; i < threads_num; i++) {
