@@ -113,12 +113,12 @@ void compute_combinations(int max_idx) {
 
 void* pthread_omp_parallel_for_get_probability(void* args) {
   int start = ((for_args*)args) -> start;
-  int end = ((for_args*)args) -> end;
+  int max_idx = ((for_args*)args) -> max_idx;
   double *factors = ((for_args*)args) -> factors;
 
   int fractorials[8] = {1, 1, 2, 6, 24, 120 , 720, 5040};
 
-  for (size_t i = start; i < end; i++) {
+  for (size_t i = start; i <= max_idx; i+=threads_num) {
     vector<double> probabilities_of_i;
     double sum_of_probabilities = 0;
     for (size_t j = 0; j < combinations[i].size(); j++) {
@@ -144,7 +144,6 @@ void* pthread_omp_parallel_for_get_probability(void* args) {
 }
 
 void get_probability(double *hash_tables, int max_idx, int hash_table_size) {
-
     double *factors = (double *)calloc(max_idx + 1, sizeof(double));
     for (size_t i = 0; i < max_idx + 1; i++) {
         if (hash_tables[i] != 0) {
@@ -156,12 +155,12 @@ void get_probability(double *hash_tables, int max_idx, int hash_table_size) {
     probabilities[0] = probabilities_of_i;
     
     int threads_size = combinations.size() / threads_num;
-    for (int i = 0; i < threads_num; i++) {
-      threads_for_args[i].start = i == 0 ? 1 : i * threads_size;
-      threads_for_args[i].end = i == threads_num -1 ? combinations.size() : (i + 1) * threads_size;
+    for (int i = 1; i <= threads_num; i++) {
+      threads_for_args[i].start = i;
+      threads_for_args[i].max_idx = max_idx;
       threads_for_args[i].factors = factors;
 
-      pthread_create(threads + i, NULL, pthread_omp_parallel_for_get_probability, threads_for_args + i);
+      pthread_create(threads + i-1, NULL, pthread_omp_parallel_for_get_probability, threads_for_args + i);
     }
     
     for (int i = 0; i < threads_num; i++) {
@@ -171,13 +170,12 @@ void get_probability(double *hash_tables, int max_idx, int hash_table_size) {
 
 void* pthread_omp_parallel_for_get_next_size_distribution(void* args) {
   int start = ((for_args*)args) -> start;
-  int end = ((for_args*)args) -> end;
   int max_idx = ((for_args *)args)->max_idx;
 
   double *local_next = (double *)calloc(max_idx + 1, sizeof(double));
 
   // #pragma omp parallel for reduction(+: next_temp[:max_idx + 1]) 
-  for (size_t i = start; i < end; i++) {
+  for (size_t i = start; i <= max_idx; i+=threads_num) {
       // if (current[i] != 0) {
           for (size_t j = 0; j < combinations[i].size(); j++) {
               // if (probabilities[i][j] != 0) {
@@ -200,12 +198,11 @@ void* pthread_omp_parallel_for_get_next_size_distribution(void* args) {
 
 void get_next_size_distribution(int max_idx) {
   int threads_size = combinations.size() / threads_num;
-  for (int i = 0; i < threads_num; i++) {
-    threads_for_args[i].start = i == 0 ? 1 : i * threads_size;
-    threads_for_args[i].end = i == threads_num -1 ? combinations.size() : (i + 1) * threads_size;
+  for (int i = 1; i <= threads_num; i++) {
+    threads_for_args[i].start = i;
     threads_for_args[i].max_idx = max_idx;
 
-    pthread_create(threads + i, NULL, pthread_omp_parallel_for_get_next_size_distribution, threads_for_args + i);
+    pthread_create(threads + i - 1, NULL, pthread_omp_parallel_for_get_next_size_distribution, threads_for_args + i);
   }
   
   for (int i = 0; i < threads_num; i++) {
